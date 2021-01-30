@@ -4,19 +4,49 @@ using UnityEngine;
 
 public class PlayerBehavior : MonoBehaviour
 {
-    public float movementForce;
-    public float jumpForce;
-    public Rigidbody rigidBody;
+    //public float movementForce;
+    //public float jumpForce;
+    //public Rigidbody rigidBody;
+    public CharacterController controller;
+
+    public float maxSpeed = 10.0f;
+    public float gravity = -30.0f;
+    public float jumpHeight = 3.0f;
+
+    public Transform groundCheck;
+    public float groundRadius = 0.5f;
+    public LayerMask groundMask;
+
+    public Vector3 velocity;
     public bool isGrounded;
     // Start is called before the first frame update
     void Start()
     {
-        rigidBody = GetComponent<Rigidbody>();
+        //rigidBody = GetComponent<Rigidbody>();
+        controller = GetComponent<CharacterController>();
+       
     }
 
     // Update is called once per frame --16.666ms update once appoximately 60 timed per second = 60fps
     void Update()
     {
+        isGrounded = Physics.CheckSphere(groundCheck.position, groundRadius, groundMask);
+
+        if (isGrounded && velocity.y < 0)
+        {
+            velocity.y = -2.0f;
+        }
+
+        float x = Input.GetAxis("Horizontal");
+        float z = Input.GetAxis("Vertical");
+
+        Vector3 move = transform.right * x + transform.forward * z;
+
+        controller.Move(move * maxSpeed * Time.deltaTime);
+
+
+
+        /*
         if (isGrounded)
         {
             if (Input.GetAxisRaw("Horizontal") > 0)
@@ -53,7 +83,7 @@ public class PlayerBehavior : MonoBehaviour
         }
         
     }
-
+    
     void OnCollisionEnter(Collision other)
     {
         if (other.gameObject.CompareTag("Ground"))
@@ -77,4 +107,12 @@ public class PlayerBehavior : MonoBehaviour
             isGrounded = false;
         }
     }
-}
+    */
+    }
+    void OnDrawGizmos()
+    {
+        Gizmos.color = Color.white;
+        Gizmos.DrawWireSphere(groundCheck.position, groundRadius);
+    }
+
+    }
